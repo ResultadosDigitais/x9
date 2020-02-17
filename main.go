@@ -70,17 +70,17 @@ func processRepositoryOrGist(url string) {
 
 	for _, file := range core.GetMatchingFiles(dir) {
 		relativeFileName := strings.Replace(file.Path, *session.Options.TempDirectory, "", -1)
-
+		relativeFileName = strings.SplitAfterN(relativeFileName, string(os.PathSeparator), 3)[2]
 		if *session.Options.SearchQuery != "" {
 			queryRegex := regexp.MustCompile(*session.Options.SearchQuery)
 			for _, match := range queryRegex.FindAllSubmatch(file.Contents, -1) {
-				matches = append(matches, string(match[0]))
+				hiddenMatch := obfuscate(string(match[0]))
+				matches = append(matches, hiddenMatch)
 			}
-
 			if matches != nil {
 				count := len(matches)
 				m := strings.Join(matches, ", ")
-				log.Result(session.Config.SlackWebhook, fmt.Sprintf("[%s] %d %s for %s in file %s: %s", url, count, core.Pluralize(count, "match", "matches"), "Search Query", relativeFileName, m))
+				log.Result(session.Config.SlackWebhook, fmt.Sprintf(":warning: *Ooops I found something...*\n*Repository:* %s\n*Matches:* %d\n*Vulnerability:* %s\n*File:* %s\n*Values:* %s\n", url, count, "Search Query", relativeFileName, m))
 
 				session.WriteToCsv([]string{url, "Search Query", relativeFileName, m})
 			}
@@ -91,15 +91,18 @@ func processRepositoryOrGist(url string) {
 
 					if part == core.PartContents {
 						if matches = signature.GetContentsMatches(file); matches != nil {
+							for i, _ := range matches {
+								matches[i] = obfuscate(matches[i])
+							}
 							count := len(matches)
 							m := strings.Join(matches, ", ")
-							log.Result(session.Config.SlackWebhook, fmt.Sprintf("[%s] %d %s for %s in file %s: %s", url, count, core.Pluralize(count, "match", "matches"), signature.Name(), relativeFileName, m))
+							log.Result(session.Config.SlackWebhook, fmt.Sprintf(":warning: *Ooops I found something...*\n*Repository:* %s\n*Matches:* %d\n *Vulnerability:* %s\n*File:* %s\n*Values:* %s\n", url, count, signature.Name(), relativeFileName, m))
 
 							session.WriteToCsv([]string{url, signature.Name(), relativeFileName, m})
 						}
 					} else {
 						if *session.Options.PathChecks {
-							log.Result(session.Config.SlackWebhook, fmt.Sprintf("[%s] Matching file %s for %s", url, relativeFileName, signature.Name()))
+							log.Result(session.Config.SlackWebhook, fmt.Sprintf(":warning: *Ooops I found something...*\n*Repository:* %s\n*File:* %s\n*Vulnerability:* %s\n", url, relativeFileName, signature.Name()))
 
 							session.WriteToCsv([]string{url, signature.Name(), relativeFileName, ""})
 						}
@@ -114,7 +117,7 @@ func processRepositoryOrGist(url string) {
 									entropy := core.GetEntropy(scanner.Text())
 
 									if entropy >= *session.Options.EntropyThreshold {
-										log.Info(fmt.Sprintf("[%s] Potential secret in %s = %s", url, relativeFileName, scanner.Text()), nil)
+										log.Result(session.Config.SlackWebhook, fmt.Sprintf(":warning: *Ooops I found something...*\n*Repository:* %s\n*Vulnerability*: Potential secret in %s = %s", url, relativeFileName, scanner.Text()))
 
 										session.WriteToCsv([]string{url, signature.Name(), relativeFileName, scanner.Text()})
 									}
@@ -134,6 +137,11 @@ func processRepositoryOrGist(url string) {
 	if !matchedAny {
 		os.RemoveAll(dir)
 	}
+}
+
+func obfuscate(text string) string {
+	size := len(text)
+	return text[0:2*size/3] + strings.Repeat("*", size/3)
 }
 
 func main() {
