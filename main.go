@@ -8,8 +8,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/eth0izzle/shhgit/core"
-	"github.com/eth0izzle/shhgit/log"
+	"github.com/ResultadosDigitais/policeman/core"
+	"github.com/ResultadosDigitais/policeman/log"
 )
 
 var session = core.GetSession()
