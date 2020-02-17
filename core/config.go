@@ -10,6 +10,11 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+const (
+	Name    = "policeman"
+	Version = "0.2"
+)
+
 type Config struct {
 	GitHubAccessTokens           []Account
 	SlackWebhook                 string            `yaml:"slack_webhook,omitempty"`

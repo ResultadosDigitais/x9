@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/eth0izzle/shhgit/log"
+	"github.com/ResultadosDigitais/policeman/log"
 	"github.com/google/go-github/github"
 )
 
