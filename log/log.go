@@ -10,18 +10,21 @@ import (
 )
 
 type Logger struct {
-	Logger    *logrus.Logger
-	DebugMode bool
+	Logger *logrus.Logger
 }
 
 var logger Logger
 
 func Init() {
+	level := logrus.InfoLevel
+	if env := os.Getenv("DEBUG"); env == "1" {
+		level = logrus.DebugLevel
+	}
 	logger = Logger{
 		Logger: &logrus.Logger{
 			Out:       os.Stdout,
 			Hooks:     make(logrus.LevelHooks),
-			Level:     logrus.DebugLevel,
+			Level:     level,
 			Formatter: &logrus.JSONFormatter{},
 		},
 	}
