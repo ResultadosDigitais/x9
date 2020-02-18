@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/ResultadosDigitais/policeman/core"
-	"github.com/ResultadosDigitais/policeman/log"
+	"github.com/ResultadosDigitais/x9/core"
+	"github.com/ResultadosDigitais/x9/log"
 )
 
 func main() {

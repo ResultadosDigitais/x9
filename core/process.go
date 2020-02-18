@@ -8,9 +8,11 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/ResultadosDigitais/policeman/log"
+	"github.com/ResultadosDigitais/x9/log"
 )
 
+// ProcessRepositories is a work that receives a git repository and process it
+// by clonning and analyzing.
 func ProcessRepositories() {
 	threadNum := *session.Options.Threads
 
@@ -18,11 +20,11 @@ func ProcessRepositories() {
 		go func(tid int) {
 
 			for {
-				repositoryId := <-session.Repositories
-				repo, err := GetRepository(session, repositoryId)
+				repositoryID := <-session.Repositories
+				repo, err := GetRepository(session, repositoryID)
 
 				if err != nil {
-					log.Error(fmt.Sprintf("Failed to retrieve repository %d: %s", repositoryId, err), nil)
+					log.Error(fmt.Sprintf("Failed to retrieve repository %d: %s", repositoryID, err), nil)
 					continue
 				}
 
@@ -37,14 +39,16 @@ func ProcessRepositories() {
 	}
 }
 
+// ProcessGists is a work that receives a gist and process it
+// by clonning and analyzing.
 func ProcessGists() {
 	threadNum := *session.Options.Threads
 
 	for i := 0; i < threadNum; i++ {
 		go func(tid int) {
 			for {
-				gistUrl := <-session.Gists
-				processRepositoryOrGist(gistUrl)
+				gistURL := <-session.Gists
+				processRepositoryOrGist(gistURL)
 			}
 		}(i)
 	}

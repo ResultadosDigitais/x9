@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/ResultadosDigitais/policeman/log"
+	"github.com/ResultadosDigitais/x9/log"
 )
 
 func GetTempDir(suffix string) string {

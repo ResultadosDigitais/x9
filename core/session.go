@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ResultadosDigitais/policeman/log"
+	"github.com/ResultadosDigitais/x9/log"
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
 )

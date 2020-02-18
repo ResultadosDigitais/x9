@@ -11,23 +11,27 @@ import (
 )
 
 const (
-	Name    = "policeman"
-	Version = "0.2"
+	Name    = "x9"
+	Version = "0.1"
 )
 
+// Config has the main analyzer configuration
 type Config struct {
 	GitHubAccessTokens           []Account
-	SlackWebhook                 string            `yaml:"slack_webhook,omitempty"`
+	SlackWebhook                 string
 	BlacklistedExtensions        []string          `yaml:"blacklisted_extensions"`
 	BlacklistedPaths             []string          `yaml:"blacklisted_paths"`
 	BlacklistedEntropyExtensions []string          `yaml:"blacklisted_entropy_extensions"`
 	Signatures                   []ConfigSignature `yaml:"signatures"`
 }
 
+//Account stores the credentials from a git account
 type Account struct {
 	AccountName string
 	Token       string
 }
+
+//ConfigSignature stores the match signature configuration
 type ConfigSignature struct {
 	Name     string `yaml:"name"`
 	Part     string `yaml:"part"`
@@ -36,6 +40,7 @@ type ConfigSignature struct {
 	Verifier string `yaml:"verifier,omitempty"`
 }
 
+//ParseConfig reads the configuration from the config.yaml file and
 func ParseConfig() (*Config, error) {
 	config := &Config{}
 
@@ -53,9 +58,12 @@ func ParseConfig() (*Config, error) {
 		return config, err
 	}
 
+	config.SlackWebhook = os.Getenv("SLACK_WEBHOOK")
+
 	return config, nil
 }
 
+//ParseAuthConfig get the github accounts from environment
 func (c *Config) ParseAuthConfig() error {
 	env, ok := os.LookupEnv("GITHUB_ACCOUNTS")
 	if !ok {
@@ -77,6 +85,7 @@ func (c *Config) ParseAuthConfig() error {
 	return nil
 }
 
+//UnmarshalYAML gets the fields from  a yaml file
 func (c *Config) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	*c = Config{}
 	type plain Config

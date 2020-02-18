@@ -2,10 +2,12 @@ package core
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"net/http"
 	"time"
 
-	"github.com/ResultadosDigitais/policeman/log"
+	"github.com/ResultadosDigitais/x9/log"
 	"github.com/google/go-github/github"
 )
 
@@ -134,6 +136,7 @@ func GetGists(session *Session) {
 }
 
 func GetRepository(session *Session, id int64) (*github.Repository, error) {
+
 	client := session.GetClient()
 	repo, resp, err := client.Repositories.GetByID(session.Context, id)
 
@@ -147,4 +150,25 @@ func GetRepository(session *Session, id int64) (*github.Repository, error) {
 	}
 
 	return repo, nil
+}
+
+func ReviewPR(session *Session, owner, repo string, pullNumber int, msg string) (int64, error) {
+	localCtx, cancel := context.WithCancel(session.Context)
+	defer cancel()
+
+	event := "REQUEST_CHANGES"
+	prReviewBody := &github.PullRequestReviewRequest{
+		Body:  &msg,
+		Event: &event,
+	}
+	client := session.GetClient()
+	prReview, resp, err := client.PullRequests.CreateReview(localCtx, owner, repo, pullNumber, prReviewBody)
+	if err != nil {
+		return -1, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return -1, errors.New("Invalid status code " + resp.Status)
+	}
+
+	return prReview.GetID(), nil
 }

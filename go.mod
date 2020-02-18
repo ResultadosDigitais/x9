@@ -1,4 +1,4 @@
-module github.com/ResultadosDigitais/policeman
+module github.com/ResultadosDigitais/x9
 
 go 1.12
 
