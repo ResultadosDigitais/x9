@@ -1,0 +1,7 @@
+version: '3'
+
+services:
+    worker:
+        build:
+            context: ../
+            dockerfile: deployments/Dockerfile
