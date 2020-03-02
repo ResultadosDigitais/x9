@@ -22,18 +22,15 @@ func ProcessRepositories() {
 			for {
 				repositoryID := <-session.Repositories
 				repo, err := GetRepository(session, repositoryID)
-
 				if err != nil {
 					log.Error(fmt.Sprintf("Failed to retrieve repository %d: %s", repositoryID, err), nil)
 					continue
 				}
 
-				if repo.GetPermissions()["pull"] &&
-					uint(repo.GetStargazersCount()) >= *session.Options.MinimumStars &&
-					uint(repo.GetSize()) < *session.Options.MaximumRepositorySize {
-
+				if repo.GetPermissions()["pull"] {
 					processRepositoryOrGist(repo.GetCloneURL())
 				}
+
 			}
 		}(i)
 	}
@@ -59,7 +56,6 @@ func processRepositoryOrGist(url string) {
 		matches    []string
 		matchedAny bool = false
 	)
-
 	dir := GetTempDir(GetHash(url))
 	_, err := CloneRepository(session, url, dir)
 	if err != nil {
