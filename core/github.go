@@ -46,10 +46,6 @@ func GetRepositories(session *Session) {
 				log.Error(fmt.Sprintf("Error getting GitHub events: %s", err.Error()), nil)
 			}
 
-			if opt.Page == 0 {
-				log.Warn(fmt.Sprintf("Token %s[..] has %d/%d calls remaining.", client.Token[:10], resp.Rate.Remaining, resp.Rate.Limit), nil)
-			}
-
 			newEvents := make([]*github.Event, 0, len(events))
 			for _, e := range events {
 				if e.GetType() == "PullRequestEvent" {
