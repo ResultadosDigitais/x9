@@ -460,4 +460,4 @@ signatures:
 ### custom
   - part: 'contents'
     regex: '''[a-zA-Z0-9._%+-]+@resultadosdigitais.com.br'''
-    name: "Email"
+    name: "RD Email"
