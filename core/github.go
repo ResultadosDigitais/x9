@@ -69,7 +69,7 @@ func GetRepositories(session *Session) {
 						log.Error("Error on parsing push events payload", map[string]interface{}{"error": err.Error()})
 					} else {
 						// Checking if source branch is master
-						pushEventInfo := parsedPayload.(github.PushEvent)
+						pushEventInfo := parsedPayload.(*github.PushEvent)
 						if ok, err := regexp.MatchString(`^.*\/master$`, *pushEventInfo.Ref); err != nil {
 							log.Error("Error matching string", map[string]interface{}{"error": err.Error()})
 						} else if ok {
