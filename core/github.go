@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"regexp"
 	"time"
 
 	"github.com/ResultadosDigitais/x9/log"
@@ -64,19 +63,19 @@ func GetRepositories(session *Session) {
 					}
 					newEvents = append(newEvents, e)
 				case "PushEvent":
-					parsedPayload, err := e.ParsePayload()
-					if err != nil {
-						log.Error("Error on parsing push events payload", map[string]interface{}{"error": err.Error()})
-					} else {
-						// Checking if source branch is master
-						pushEventInfo := parsedPayload.(*github.PushEvent)
-						if ok, err := regexp.MatchString(`^.*\/master$`, *pushEventInfo.Ref); err != nil {
-							log.Error("Error matching string", map[string]interface{}{"error": err.Error()})
-						} else if ok {
-							newEvents = append(newEvents, e)
-						}
+					// parsedPayload, err := e.ParsePayload()
+					// if err != nil {
+					// 	log.Error("Error on parsing push events payload", map[string]interface{}{"error": err.Error()})
+					// } else {
+					// 	// Checking if source branch is master
+					// 	pushEventInfo := parsedPayload.(*github.PushEvent)
+					// 	if ok, err := regexp.MatchString(`^.*\/master$`, *pushEventInfo.Ref); err != nil {
+					// 		log.Error("Error matching string", map[string]interface{}{"error": err.Error()})
+					// 	} else if ok {
+					// 		newEvents = append(newEvents, e)
+					// 	}
 
-					}
+					// }
 				}
 			}
 			for _, e := range newEvents {
