@@ -3,7 +3,6 @@ package log
 import (
 	"os"
 	"runtime"
-	"time"
 
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
@@ -30,35 +29,34 @@ func Init() {
 	}
 }
 
-func Fatal(msg string, extraFields map[string]string) {
+func Fatal(msg string, extraFields map[string]interface{}) {
 	logger.Logger.WithFields(getFields(extraFields)).Fatal(msg)
 }
 
-func Error(msg string, extraFields map[string]string) {
+func Error(msg string, extraFields map[string]interface{}) {
 	logger.Logger.WithFields(getFields(extraFields)).Error(msg)
 }
 
-func Warn(msg string, extraFields map[string]string) {
+func Warn(msg string, extraFields map[string]interface{}) {
 	logger.Logger.WithFields(getFields(extraFields)).Warn(msg)
 }
 
-func Info(msg string, extraFields map[string]string) {
+func Info(msg string, extraFields map[string]interface{}) {
 	logger.Logger.WithFields(getFields(extraFields)).Info(msg)
 
 }
 
-func Debug(msg string, extraFields map[string]string) {
+func Debug(msg string, extraFields map[string]interface{}) {
 	logger.Logger.WithFields(getFields(extraFields)).Debug(msg)
 }
 
-func getFields(extraFields map[string]string) logrus.Fields {
+func getFields(extraFields map[string]interface{}) logrus.Fields {
 	programCounter, file, line, _ := runtime.Caller(2)
 	function := runtime.FuncForPC(programCounter)
 	fields := log.Fields{
-		"file":      file,
-		"line":      line,
-		"timestamp": float64(time.Now().Unix()),
-		"function":  function.Name(),
+		"file":     file,
+		"line":     line,
+		"function": function.Name(),
 	}
 	for k, v := range extraFields {
 		fields[k] = v
