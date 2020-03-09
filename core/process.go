@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/ResultadosDigitais/x9/log"
+	"github.com/ResultadosDigitais/x9/log/slack"
 )
 
 // ProcessRepositories is a work that receives a git repository and process it
@@ -77,7 +78,15 @@ func processRepositoryOrGist(url string) {
 			if matches != nil {
 				count := len(matches)
 				m := strings.Join(matches, ", ")
-				log.Result(session.Config.SlackWebhook, fmt.Sprintf(":warning: *Ooops I found something...*\n*Repository:* %s\n*Matches:* %d\n*Vulnerability:* %s\n*File:* %s\n*Values:* %s\n", url, count, "Search Query", relativeFileName, m))
+				fields := map[string]interface{}{
+					"repo":    url,
+					"matches": count,
+					"vuln":    "Search Query",
+					"file":    relativeFileName,
+					"values":  m,
+				}
+				slack.Send(session.Config.SlackWebhook, fields)
+				log.Info("Vulnerability found", fields)
 
 				session.WriteToCsv([]string{url, "Search Query", relativeFileName, m})
 			}
@@ -93,13 +102,28 @@ func processRepositoryOrGist(url string) {
 							}
 							count := len(matches)
 							m := strings.Join(matches, ", ")
-							log.Result(session.Config.SlackWebhook, fmt.Sprintf(":warning: *Ooops I found something...*\n*Repository:* %s\n*Matches:* %d\n *Vulnerability:* %s\n*File:* %s\n*Values:* %s\n", url, count, signature.Name(), relativeFileName, m))
+
+							fields := map[string]interface{}{
+								"repo":    url,
+								"matches": count,
+								"vuln":    signature.Name(),
+								"file":    relativeFileName,
+								"values":  m,
+							}
+							slack.Send(session.Config.SlackWebhook, fields)
+							log.Info("Vulnerability found", fields)
 
 							session.WriteToCsv([]string{url, signature.Name(), relativeFileName, m})
 						}
 					} else {
 						if *session.Options.PathChecks {
-							log.Result(session.Config.SlackWebhook, fmt.Sprintf(":warning: *Ooops I found something...*\n*Repository:* %s\n*File:* %s\n*Vulnerability:* %s\n", url, relativeFileName, signature.Name()))
+							fields := map[string]interface{}{
+								"repo": url,
+								"vuln": signature.Name(),
+								"file": relativeFileName,
+							}
+							slack.Send(session.Config.SlackWebhook, fields)
+							log.Info("Vulnerability found", fields)
 
 							session.WriteToCsv([]string{url, signature.Name(), relativeFileName, ""})
 						}
@@ -114,7 +138,15 @@ func processRepositoryOrGist(url string) {
 									entropy := GetEntropy(scanner.Text())
 
 									if entropy >= *session.Options.EntropyThreshold {
-										log.Result(session.Config.SlackWebhook, fmt.Sprintf(":warning: *Ooops I found something...*\n*Repository:* %s\n*Vulnerability*: Potential secret in %s = %s", url, relativeFileName, scanner.Text()))
+										fields := map[string]interface{}{
+											"repo":    url,
+											"vuln":    "Potential secret",
+											"file":    relativeFileName,
+											"matches": 1,
+											"values":  scanner.Text(),
+										}
+										slack.Send(session.Config.SlackWebhook, fields)
+										log.Info("Vulnerability found", fields)
 
 										session.WriteToCsv([]string{url, signature.Name(), relativeFileName, scanner.Text()})
 									}

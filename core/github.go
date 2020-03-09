@@ -55,7 +55,6 @@ func GetRepositories(session *Session) {
 					newEvents = append(newEvents, e)
 				}
 			}
-
 			for _, e := range newEvents {
 				observedKeys[e.GetRepo().GetID()] = true
 				session.Repositories <- e.GetRepo().GetID()
