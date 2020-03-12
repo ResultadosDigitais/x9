@@ -3,6 +3,7 @@ package sast
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"os"
 	"strings"
 
@@ -18,6 +19,7 @@ type Leaks struct {
 }
 
 func (l *Leaks) Test(url, dir string) {
+	log.Info(fmt.Sprintf("Testing repository %s", url), nil)
 	var (
 		matches []string
 	)

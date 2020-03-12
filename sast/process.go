@@ -25,7 +25,7 @@ func (pw *ProcessWorker) InitWorkers(w int) {
 
 func (pw *ProcessWorker) ProcessEvent() {
 	for e := range pw.Events {
-		log.Info("Receive event"+*e.Action, nil)
+		log.Info("Receive event: "+*e.Action, nil)
 		repository, err := pw.Session.GetRepository(e.GetRepo().GetID())
 		url := repository.GetCloneURL()
 		if err != nil {
