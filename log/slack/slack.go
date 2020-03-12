@@ -5,11 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/ResultadosDigitais/x9/log"
 )
 
-func Send(slackWebHook string, fields map[string]interface{}) {
+func Send(fields map[string]interface{}) {
+	slackWebHook := os.Getenv("SLACK_WEBHOOK")
 	if slackWebHook != "" {
 		slackMessage := formatMessage(fields)
 		values := map[string]string{"text": slackMessage}
