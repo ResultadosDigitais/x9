@@ -29,11 +29,11 @@ func (pw *ProcessWorker) ProcessEvent() {
 		repository, err := pw.Session.GetRepository(e.GetRepo().GetID())
 		url := repository.GetURL()
 		if err != nil {
-			log.Error(fmt.Sprintf("Error getting repository info: %s", url), map[string]string{"error": err.Error()})
+			log.Error(fmt.Sprintf("Error getting repository info: %s", url), map[string]interface{}{"error": err.Error()})
 		}
 		dir := util.GetTempDir(os.TempDir(), util.GetHash(url, time.Now().String()))
 		if _, err := pw.Session.CloneRepository(url, dir); err != nil {
-			log.Error(fmt.Sprintf("Error cloning repository: %s", url), map[string]string{"error": err.Error()})
+			log.Error(fmt.Sprintf("Error cloning repository: %s", url), map[string]interface{}{"error": err.Error()})
 
 		}
 
