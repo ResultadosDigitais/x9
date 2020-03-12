@@ -46,7 +46,7 @@ func main() {
 	e := echo.New()
 
 	e.GET("/healthcheck", handler.HealthCheck)
-	e.GET("/events", handler.Event)
+	e.POST("/events", handler.Event)
 
 	e.Logger.Fatal(e.Start(":3000"))
 
