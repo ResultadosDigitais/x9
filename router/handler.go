@@ -31,6 +31,7 @@ func (h *Handler) Event(c echo.Context) error {
 		log.Error("Request error", map[string]interface{}{"error": err.Error()})
 		return c.NoContent(http.StatusBadRequest)
 	}
+	log.Info("Event Received", nil)
 	switch event := event.(type) {
 	case *github.PullRequestEvent:
 		h.Process <- event
