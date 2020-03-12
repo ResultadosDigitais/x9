@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/ResultadosDigitais/x9/git"
 	"github.com/ResultadosDigitais/x9/router"
 	"github.com/ResultadosDigitais/x9/sast"
@@ -23,7 +21,6 @@ func main() {
 	if err := githubSession.InitClient(); err != nil {
 		log.Fatal(err.Error(), nil)
 	}
-	fmt.Println(githubSession)
 
 	leaks := sast.Leaks{}
 	if err := leaks.GetLeaksConfig(); err != nil {

@@ -3,7 +3,6 @@ package git
 import (
 	"context"
 	"errors"
-	"fmt"
 	"os"
 	"strings"
 	"time"
@@ -44,7 +43,6 @@ func (gs *GithubSession) InitClient() error {
 	if err := gs.ParseAuthConfig(); err != nil {
 		return err
 	}
-	fmt.Println(gs)
 
 	staticTokenSource := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: gs.AccountToken})
 	client := oauth2.NewClient(gs.Context, staticTokenSource)
