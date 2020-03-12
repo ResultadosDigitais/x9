@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -49,13 +50,19 @@ func (gs *GithubSession) InitClient() error {
 	client := oauth2.NewClient(gs.Context, staticTokenSource)
 
 	githubClient := github.NewClient(client)
-
 	githubClient.UserAgent = "x9 v1.0"
 	_, _, err := githubClient.Users.Get(gs.Context, "")
 	if err != nil {
 		return err
 	}
 	gs.Client = githubClient
+
+	gs.Timeout = 60
+	if timeout, ok := os.LookupEnv("CLONE_TIMEOUT"); ok {
+		if intTimeout, err := strconv.Atoi(timeout); err == nil {
+			gs.Timeout = intTimeout
+		}
+	}
 	return nil
 }
 

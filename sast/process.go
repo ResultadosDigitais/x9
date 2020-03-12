@@ -27,7 +27,7 @@ func (pw *ProcessWorker) ProcessEvent() {
 	for e := range pw.Events {
 		log.Info("Receive event"+*e.Action, nil)
 		repository, err := pw.Session.GetRepository(e.GetRepo().GetID())
-		url := repository.GetURL()
+		url := repository.GetCloneURL()
 		if err != nil {
 			log.Error(fmt.Sprintf("Error getting repository info: %s", url), map[string]interface{}{"error": err.Error()})
 		}
