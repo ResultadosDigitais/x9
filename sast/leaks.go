@@ -14,8 +14,8 @@ import (
 )
 
 type Leaks struct {
-	Signatures []Signature
 	Config     Config
+	Signatures []Signature
 }
 
 func (l *Leaks) Test(url, dir string) {
@@ -94,6 +94,8 @@ func (l *Leaks) GetLeaksConfig() error {
 		return err
 	}
 	l.Config = config
+	l.Signatures = GetSignatures(l.Config)
+
 	return nil
 
 }
