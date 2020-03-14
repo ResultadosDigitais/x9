@@ -1,6 +1,7 @@
 package router
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 
@@ -31,10 +32,16 @@ func (h *Handler) Event(c echo.Context) error {
 		log.Error("Request error", map[string]interface{}{"error": err.Error()})
 		return c.NoContent(http.StatusBadRequest)
 	}
-	log.Info("Event Received", nil)
 	switch event := event.(type) {
 	case *github.PullRequestEvent:
+		log.Info(fmt.Sprintf("Event received: %s from repository %s", *event.Action, *event.GetRepo().FullName), map[string]string{
+			"src_ip": c.Request().RemoteAddr,
+		})
 		h.Process <- event
+	default:
+		log.Warn(fmt.Sprintf("Unexpected event received: %s", event), map[string]string{
+			"src_ip": c.Request().RemoteAddr,
+		})
 	}
 	return c.NoContent(http.StatusOK)
 
