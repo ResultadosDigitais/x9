@@ -34,12 +34,12 @@ func (h *Handler) Event(c echo.Context) error {
 	}
 	switch event := event.(type) {
 	case *github.PullRequestEvent:
-		log.Info(fmt.Sprintf("Event received: %s from repository %s", *event.Action, *event.GetRepo().FullName), map[string]string{
+		log.Info(fmt.Sprintf("Event received: %s from repository %s", *event.Action, *event.GetRepo().FullName), map[string]interface{}{
 			"src_ip": c.Request().RemoteAddr,
 		})
 		h.Process <- event
 	default:
-		log.Warn(fmt.Sprintf("Unexpected event received: %s", event), map[string]string{
+		log.Warn(fmt.Sprintf("Unexpected event received: %s", event), map[string]interface{}{
 			"src_ip": c.Request().RemoteAddr,
 		})
 	}
