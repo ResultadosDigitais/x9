@@ -18,14 +18,13 @@ type ProcessWorker struct {
 }
 
 func (pw *ProcessWorker) InitWorkers(w int) {
-	for w := 1; w <= 3; w++ {
+	for i := 0; i < w; i++ {
 		go pw.ProcessEvent()
 	}
 }
 
 func (pw *ProcessWorker) ProcessEvent() {
 	for e := range pw.Events {
-		log.Info("Receive event: "+*e.Action, nil)
 		repository, err := pw.Session.GetRepository(e.GetRepo().GetID())
 		url := repository.GetCloneURL()
 		if err != nil {
