@@ -33,8 +33,7 @@ func main() {
 		Leaks:   leaks,
 		Events:  eventsChannel,
 	}
-
-	processWorker.InitWorkers(5)
+	processWorker.InitWorkers(3)
 
 	handler := router.Handler{
 		Process: eventsChannel,
