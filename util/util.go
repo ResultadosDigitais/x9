@@ -8,8 +8,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/ResultadosDigitais/x9/log"
 )
 
 func GetTempDir(tempDir, suffix string) string {
@@ -24,25 +22,8 @@ func GetTempDir(tempDir, suffix string) string {
 	return dir
 }
 
-func PathExists(path string) bool {
-	_, err := os.Stat(path)
-	if err == nil {
-		return true
-	}
-
-	if os.IsNotExist(err) {
-		return false
-	}
-
-	return false
-}
-
-func LogIfError(text string, err error) {
-	if err != nil {
-		log.Error(fmt.Sprintf("%s (%s", text, err.Error()), nil)
-	}
-}
-
+// GetHash receives one or more strings and returns
+// a sha1 hash of the concatenation of all of them
 func GetHash(values ...string) string {
 	str := values[0]
 	for i := 1; i < len(values); i++ {
@@ -51,14 +32,6 @@ func GetHash(values ...string) string {
 	hashString := sha1.New()
 	hashString.Write([]byte(str))
 	return hex.EncodeToString(hashString.Sum(nil))
-}
-
-func Pluralize(count int, singular string, plural string) string {
-	if count == 1 {
-		return singular
-	}
-
-	return plural
 }
 
 func GetEntropy(data string) (entropy float64) {
@@ -76,7 +49,18 @@ func GetEntropy(data string) (entropy float64) {
 	return entropy
 }
 
+// Obfuscate changes the last 1/3 string characters by *'s
 func Obfuscate(text string) string {
 	size := len(text)
-	return text[0:2*size/3] + strings.Repeat("*", size/3)
+	return text[0:2*size/3] + strings.Repeat("*", len(text)-2*size/3)
+}
+
+func IsX9Action(action string) bool {
+	listActions := []string{"opened", "edited", "reopened"}
+	for _, v := range listActions {
+		if action == v {
+			return true
+		}
+	}
+	return false
 }
