@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/ResultadosDigitais/x9/log"
+	"github.com/ResultadosDigitais/x9/util"
 	"github.com/google/go-github/github"
 	"github.com/labstack/echo"
 )
@@ -32,15 +33,19 @@ func (h *Handler) Event(c echo.Context) error {
 		log.Error("Request error", map[string]interface{}{"error": err.Error()})
 		return c.NoContent(http.StatusBadRequest)
 	}
+	src := c.Request().Header.Get("X-Forward-For")
 	switch event := event.(type) {
 	case *github.PullRequestEvent:
-		log.Info(fmt.Sprintf("Event received: %s from repository %s", *event.Action, *event.GetRepo().FullName), map[string]interface{}{
-			"src_ip": c.Request().RemoteAddr,
-		})
-		h.Process <- event
+		if util.IsX9Action(*event.Action) {
+			log.Info(fmt.Sprintf("Event received: %s from repository %s", *event.Action, *event.GetRepo().FullName), map[string]interface{}{
+				"src_ip": src,
+			})
+			h.Process <- event
+		}
+
 	default:
 		log.Warn(fmt.Sprintf("Unexpected event received: %s", event), map[string]interface{}{
-			"src_ip": c.Request().RemoteAddr,
+			"src_ip": src,
 		})
 	}
 	return c.NoContent(http.StatusOK)
