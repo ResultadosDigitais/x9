@@ -1,6 +1,7 @@
 blacklisted_extensions: [".exe", ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".tif", ".psd", ".xcf", ".zip", ".tar.gz", ".ttf", ".lock"]
 blacklisted_paths: ["node_modules{sep}", "vendor{sep}bundle", "vendor{sep}cache"] # use {sep} for the OS' path seperator (i.e. / or \)
 blacklisted_entropy_extensions: [".pem", "id_rsa", ".asc", ".ovpn", ".sqlite", ".sqlite3"] # additional extensions to skip entropy checks
+blacklisted_repositories: ["x9"]
 signatures:
   - part:  'extension'
     match: '.pem'
@@ -458,6 +459,6 @@ signatures:
     regex: '''(?i)(id_rsa|passwd|id_rsa.pub|pgpass|pem|key|shadow)'''
     name: 'Keys or password files'
 ### custom
-  - part: 'contents'
-    regex: '''[a-zA-Z0-9._%+-]+@resultadosdigitais.com.br'''
-    name: "RD Email"
+  # - part: 'contents'
+  #   regex: '''[a-zA-Z0-9._%+-]+@resultadosdigitais.com.br'''
+  #   name: "RD Email"
