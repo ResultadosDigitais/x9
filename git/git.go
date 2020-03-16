@@ -3,7 +3,6 @@ package git
 import (
 	"context"
 	"errors"
-	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -68,7 +67,6 @@ func (gs *GithubSession) InitClient() error {
 
 func (gs *GithubSession) CloneRepository(url, dir string) (*git.Repository, error) {
 	localCtx, cancel := context.WithTimeout(gs.Context, time.Duration(gs.Timeout)*time.Second)
-	fmt.Println(gs.AccountName)
 	defer cancel()
 	auth := &http.BasicAuth{Username: gs.AccountName, Password: gs.AccountToken}
 
