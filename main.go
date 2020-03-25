@@ -1,30 +1,49 @@
 package main
 
 import (
-	"fmt"
+	"github.com/ResultadosDigitais/x9/git"
+	"github.com/ResultadosDigitais/x9/router"
+	"github.com/ResultadosDigitais/x9/sast"
+	"github.com/google/go-github/github"
+	"github.com/labstack/echo"
 
-	"github.com/ResultadosDigitais/x9/core"
 	"github.com/ResultadosDigitais/x9/log"
 )
 
 func main() {
-	session := core.GetSession()
+
 	log.Init()
-	log.Info(fmt.Sprintf("%s v%s started. Loaded %d signatures. Using %d GitHub tokens and %d threads. Work dir: %s", core.Name, core.Version, len(session.Signatures), len(session.Clients), *session.Options.Threads, *session.Options.TempDirectory), nil)
+	log.Info("X9 started...", nil)
 
-	if *session.Options.SearchQuery != "" {
-		log.Info(fmt.Sprintf("Search Query '%s' given. Only returning matching results.", *session.Options.SearchQuery), nil)
+	eventsChannel := make(chan *github.PullRequestEvent)
+
+	githubSession := git.GithubSession{}
+	if err := githubSession.InitClient(); err != nil {
+		log.Fatal(err.Error(), nil)
+	}
+
+	leaks := sast.Leaks{}
+	if err := leaks.GetLeaksConfig(); err != nil {
+		log.Fatal(err.Error(), nil)
 
 	}
 
-	go core.GetRepositories(session)
-	go core.ProcessRepositories()
+	processWorker := sast.ProcessWorker{
+		Session: githubSession,
+		Leaks:   leaks,
+		Events:  eventsChannel,
+	}
+	processWorker.InitWorkers(3)
 
-	if *session.Options.ProcessGists {
-		go core.GetGists(session)
-		go core.ProcessGists()
+	handler := router.Handler{
+		Process: eventsChannel,
 	}
 
-	log.Info("Press Crt+C to stop and exit. \n", nil)
-	select {}
+	e := echo.New()
+
+	e.GET("/healthcheck", handler.HealthCheck)
+	e.POST("/events", handler.Event)
+
+	e.Logger.Fatal(e.Start(":3000"))
+
 }
