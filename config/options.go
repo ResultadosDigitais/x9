@@ -28,7 +28,7 @@ type Options struct {
 
 func ParseConfig() error {
 	dir, _ := os.Getwd()
-	data, err := ioutil.ReadFile(path.Join(dir, "config2.yaml"))
+	data, err := ioutil.ReadFile(path.Join(dir, "config.yaml"))
 	if err != nil {
 		return err
 	}
