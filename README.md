@@ -42,7 +42,21 @@ X9 has many workers, which can be configured to deal with a great number of requ
 
 ### Customize
 
-  
+
+
+#### General configuration
+
+The following parameters can be configurated by editing the `config.yaml` file:
+
+| name | type | description |
+|--|--| -- |
+| num_threads | int | number of workers that x9 will initialize|
+| debug_mode | bool | sets the log level to debug |
+|minimum_file_size | int | minimum file size that x9 will test |
+|maximum_file_size | int | maximum file size that x9 will test |
+| clone_repository_timeout | int | maximum duration in seconds to clone a repository     |
+| blacklisted_repositories | list of strings| list of repositories in the format `Organization/Repository` that x9 will skip  |
+
 
 #### Signatures
 
