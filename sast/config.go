@@ -8,11 +8,6 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-const (
-	Name    = "x9"
-	Version = "0.1"
-)
-
 // Config has the main analyzer configuration
 type Config struct {
 	BlacklistedExtensions        []string          `yaml:"blacklisted_extensions"`
@@ -35,7 +30,7 @@ func ParseConfig() (Config, error) {
 	config := Config{}
 
 	dir, _ := os.Getwd()
-	data, err := ioutil.ReadFile(path.Join(dir, "config.yaml"))
+	data, err := ioutil.ReadFile(path.Join(dir, "sast/config.yaml"))
 	if err != nil {
 		return config, err
 	}
