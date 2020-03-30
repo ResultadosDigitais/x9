@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/ResultadosDigitais/x9/log"
-	"github.com/ResultadosDigitais/x9/util"
 	"github.com/google/go-github/github"
 	"github.com/labstack/echo"
 )
@@ -36,7 +35,7 @@ func (h *Handler) Event(c echo.Context) error {
 	src := c.Request().Header.Get("X-Forward-For")
 	switch event := event.(type) {
 	case *github.PullRequestEvent:
-		if util.IsX9Action(*event.Action) {
+		if isX9Action(*event.Action) {
 			log.Info(fmt.Sprintf("Event received: %s from repository %s", *event.Action, *event.GetRepo().FullName), map[string]interface{}{
 				"src_ip": src,
 			})
@@ -50,4 +49,14 @@ func (h *Handler) Event(c echo.Context) error {
 	}
 	return c.NoContent(http.StatusOK)
 
+}
+
+func isX9Action(action string) bool {
+	listActions := []string{"opened", "edited", "reopened"}
+	for _, v := range listActions {
+		if action == v {
+			return true
+		}
+	}
+	return false
 }
