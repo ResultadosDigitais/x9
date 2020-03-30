@@ -59,28 +59,15 @@ The following parameters can be configurated by editing the `config.yaml` file:
 
 
 #### Signatures
-
   
 
-Signatures are regular expressions that X9 will use to found potential sensitive data in your code. You can disable or add new signatures by editing `sast/config.yaml` file.
+Signatures are regular expressions that X9 will use to found potential sensitive data in your code. X9 has some default signatures but you can disable or add new ones by editing `sast/config.yaml` file.
 
-  
 
 Signatures have some fields that you need to set:
 
-  
-
--  **part**
-part is the resource type x9 will apply the regex. It has to be set with one of the following possible values:
-   - *extension*: matches files extension
-   - *path*: matches full path values
-   - *filename*: matches filename only
-   - *contents*: matches values inside files
-
-  
--  **regex**
-The regular expression that will be used to match values in the respective resource.
-
--  **name**
-Vulnerability name that will be displayed on the report.
-
+  | name | type | description |
+|--|--| -- |
+| part | string |  the resource type x9 will apply the regex. It has to be set with one of the following possible values (`extension | path | filename | contents` ) |
+| regex | string | The regular expression that will be used to match values in the respective resource. |
+| name | int |  Vulnerability name that will be displayed on the report. |
