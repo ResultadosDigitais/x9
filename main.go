@@ -7,15 +7,16 @@ import (
 	"github.com/google/go-github/github"
 	"github.com/labstack/echo"
 
+	"github.com/ResultadosDigitais/x9/config"
 	"github.com/ResultadosDigitais/x9/log"
 )
 
 func main() {
 
+	config.ParseConfig()
+
 	log.Init()
 	log.Info("X9 started...", nil)
-
-	eventsChannel := make(chan *github.PullRequestEvent)
 
 	githubSession := git.GithubSession{}
 	if err := githubSession.InitClient(); err != nil {
@@ -28,12 +29,13 @@ func main() {
 
 	}
 
+	eventsChannel := make(chan *github.PullRequestEvent)
 	processWorker := sast.ProcessWorker{
 		Session: githubSession,
 		Leaks:   leaks,
 		Events:  eventsChannel,
 	}
-	processWorker.InitWorkers(3)
+	processWorker.InitWorkers(*config.Opts.Threads)
 
 	handler := router.Handler{
 		Process: eventsChannel,
