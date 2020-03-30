@@ -57,24 +57,16 @@ Signatures have some fields that you need to set:
   
 
 -  **part**
-
 part is the resource type x9 will apply the regex. It has to be set with one of the following possible values:
-
-- *extension*: matches files extension
-
-- *path*: matches full path values
-
-- *filename*: matches filename only
-
-- *contents*: matches values inside files
+   - *extension*: matches files extension
+   - *path*: matches full path values
+   - *filename*: matches filename only
+   - *contents*: matches values inside files
 
   
-
 -  **regex**
-
 The regular expression that will be used to match values in the respective resource.
 
 -  **name**
-
 Vulnerability name that will be displayed on the report.
 
