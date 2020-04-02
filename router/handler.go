@@ -2,16 +2,22 @@ package router
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 
+	"github.com/ResultadosDigitais/x9/actions"
+	"github.com/ResultadosDigitais/x9/crypto"
+	"github.com/ResultadosDigitais/x9/git"
 	"github.com/ResultadosDigitais/x9/log"
+
 	"github.com/google/go-github/github"
 	"github.com/labstack/echo"
 )
 
 type Handler struct {
 	Process chan *github.PullRequestEvent
+	Session *git.GithubSession
 }
 
 // HealthCheck returns a status code 200
@@ -47,6 +53,26 @@ func (h *Handler) Event(c echo.Context) error {
 			"src_ip": src,
 		})
 	}
+	return c.NoContent(http.StatusOK)
+
+}
+
+func (h *Handler) Action(c echo.Context) error {
+	secret := os.Getenv("SLACK_SECRET_KEY")
+	version := "v0"
+	timestamp := c.Request().Header.Get("X-Slack-Request-Timestamp")
+	slackSignature := c.Request().Header.Get("X-Slack-Signature")
+	body, err := ioutil.ReadAll(c.Request().Body)
+
+	if err != nil {
+		return c.NoContent(http.StatusBadRequest)
+	}
+	content := version + timestamp + string(body)
+	if !crypto.ValidateHMAC(content, slackSignature, version, secret) {
+		return c.NoContent(http.StatusBadRequest)
+	}
+
+	actions.ProcessAction(body, h.Session)
 	return c.NoContent(http.StatusOK)
 
 }
