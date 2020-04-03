@@ -86,8 +86,7 @@ func InitTables() error {
 	)`
 
 	createTableFP := `CREATE TABLE IF NOT EXISTS false_positives (
-		type varchar(45) NOT NULL,
-		vuln_id varchar(200) NOT NULL,
+		context varchar(45) NOT NULL,
 		fp_hash varchar(255) NOT NULL UNIQUE,
 		FOREIGN KEY (vuln_id) REFERENCES vulnerabilities (id)
 	)`
