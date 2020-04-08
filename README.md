@@ -68,6 +68,6 @@ Signatures have some fields that you need to set:
 
   | name | type | description |
 |--|--| -- |
-| part | string |  the resource type x9 will apply the regex. It has to be set with one of the following possible values (*extension* \| *path* \| *filename* \| *contents*` ) |
+| part | string |  the resource type x9 will apply the regex. It has to be set with one of the following possible values (*extension* \| *path* \| *filename* \| *contents* ) |
 | regex | string | The regular expression that will be used to match values in the respective resource. |
 | name | int |  Vulnerability name that will be displayed on the report. |
