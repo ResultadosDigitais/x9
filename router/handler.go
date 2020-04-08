@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
 
 	"github.com/ResultadosDigitais/x9/actions"
@@ -65,14 +66,22 @@ func (h *Handler) Action(c echo.Context) error {
 	body, err := ioutil.ReadAll(c.Request().Body)
 
 	if err != nil {
-		return c.NoContent(http.StatusBadRequest)
-	}
-	content := version + timestamp + string(body)
-	if !crypto.ValidateHMAC(content, slackSignature, version, secret) {
+		log.Error("Error parsing body", map[string]interface{}{"error": err.Error()})
 		return c.NoContent(http.StatusBadRequest)
 	}
 
-	actions.ProcessAction(body, h.Session)
+	content := fmt.Sprintf("%s:%s:%s", version, timestamp, string(body))
+	if !crypto.ValidateHMAC(content, slackSignature, version, secret) {
+		log.Error("Error validating signature", nil)
+
+		return c.NoContent(http.StatusBadRequest)
+	}
+	values, err := url.ParseQuery(string(body))
+	if err != nil {
+		log.Error("Error on parsing form values", map[string]interface{}{"error": err.Error()})
+	}
+	payload := values.Get("payload")
+	actions.ProcessAction(payload, h.Session)
 	return c.NoContent(http.StatusOK)
 
 }
