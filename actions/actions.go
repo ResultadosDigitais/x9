@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/ResultadosDigitais/x9/git"
+	"github.com/ResultadosDigitais/x9/log"
 	"github.com/ResultadosDigitais/x9/management"
 )
 
@@ -45,15 +46,21 @@ type User struct {
 	Name string `json:"name"`
 }
 
-func ProcessAction(body []byte, gs *git.GithubSession) error {
+func ProcessAction(body string, gs *git.GithubSession) error {
 	var action SlackAction
-	json.Unmarshal(body, &action)
+	if err := json.Unmarshal([]byte(body), &action); err != nil {
+		log.Error("Error parsing json", map[string]interface{}{"error": err.Error()})
+	}
 
-	if action.Type == "default" &&
+	if action.Type == "interactive_message" &&
 		action.Actions[0].Value == "open_issue" {
 		vuln, err := management.GetVulnerabilityByID(action.CallbackID)
 		if err != nil {
+			log.Error("Error on getting vulnerability", map[string]interface{}{"error": err.Error()})
 			return err
+		}
+		if vuln.IssueURL != "" {
+			return nil
 		}
 		title := getIssueTitle(vuln.Name, vuln.FileName)
 		body := getIssueBody(vuln.Name, vuln.Value, vuln.FileName)
@@ -62,8 +69,16 @@ func ProcessAction(body []byte, gs *git.GithubSession) error {
 			"Security",
 		}
 		owner, repo := getRepoInfo(vuln.Repository)
-		_, err = gs.OpenIssue(owner, repo, title, body, labels)
-		return nil
+		issueURL, err := gs.OpenIssue(owner, repo, title, body, labels)
+		if err != nil {
+			log.Error("Error openning issue", map[string]interface{}{"error": err.Error()})
+		} else {
+			if err := management.SetIssueURL(vuln.ID, issueURL); err != nil {
+				log.Error("Error on updating issue URL", map[string]interface{}{"error": err.Error()})
+			}
+		}
+
+		return err
 	}
 	return nil
 }
