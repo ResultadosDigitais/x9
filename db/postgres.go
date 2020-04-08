@@ -60,6 +60,14 @@ func Query(query string, params ...interface{}) (*sql.Rows, error) {
 	rows, err := stmt.Query(params...)
 	return rows, err
 }
+func QueryRow(query string, params ...interface{}) (*sql.Row, error) {
+	stmt, err := conn.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+	row := stmt.QueryRow(params...)
+	return row, err
+}
 
 func Exec(query string, params ...interface{}) error {
 	stmt, err := conn.Prepare(query)
@@ -74,7 +82,6 @@ func Exec(query string, params ...interface{}) error {
 func InitTables() error {
 	createTableVuln := `CREATE TABLE IF NOT EXISTS vulnerabilities (
 		id varchar(200) NOT NULL,
-		internal_id varchar(200) NOT NULL UNIQUE,
 		name varchar(200) NOT NULL,
 		repository varchar(255) NOT NULL,
 		filename varchar(255) NOT NULL,
@@ -85,17 +92,7 @@ func InitTables() error {
 		PRIMARY KEY(id)
 	)`
 
-	createTableFP := `CREATE TABLE IF NOT EXISTS false_positives (
-		context varchar(45) NOT NULL,
-		fp_hash varchar(255) NOT NULL UNIQUE,
-		FOREIGN KEY (vuln_id) REFERENCES vulnerabilities (id)
-	)`
-
 	_, err := conn.Exec(createTableVuln)
-	if err != nil {
-		return err
-	}
-	_, err = conn.Exec(createTableFP)
 	if err != nil {
 		return err
 	}
