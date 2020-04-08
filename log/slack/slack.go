@@ -10,11 +10,41 @@ import (
 	"github.com/ResultadosDigitais/x9/log"
 )
 
-func Send(fields map[string]interface{}) {
+func Send(repository, vulnerability, filename, values, id, issueURL string) {
 	slackWebHook := os.Getenv("SLACK_WEBHOOK")
+	interactiveActions := getInteractiveActionsFields(id, issueURL)
 	if slackWebHook != "" {
-		slackMessage := formatMessage(fields)
-		values := map[string]string{"text": slackMessage}
+		values := map[string]interface{}{
+			"text": ":warning: *Vulnerability found*",
+			"attachments": []map[string]interface{}{
+				map[string]interface{}{
+					"color": "#AB3117",
+					"fields": []map[string]interface{}{
+						map[string]interface{}{
+							"title": "Repository",
+							"value": repository,
+							"short": false,
+						},
+						map[string]interface{}{
+							"title": "Vulnerability",
+							"value": vulnerability,
+							"short": false,
+						},
+						map[string]interface{}{
+							"title": "File",
+							"value": filename,
+							"short": false,
+						},
+						map[string]interface{}{
+							"title": "Values",
+							"value": values,
+							"short": false,
+						},
+					},
+				},
+				interactiveActions,
+			},
+		}
 		jsonValue, _ := json.Marshal(values)
 		resp, err := http.Post(slackWebHook, "application/json", bytes.NewBuffer(jsonValue))
 		if err != nil {
@@ -25,16 +55,32 @@ func Send(fields map[string]interface{}) {
 	}
 }
 
-func formatMessage(fields map[string]interface{}) string {
-
-	if _, ok := fields["matches"]; ok {
-		return fmt.Sprintf(":warning: *Ooops I found something...*\n"+
-			"*Repository:* %s\n*File:* %s\n*Vulnerability:* %s\n*Matches:* %d\n*Values:* %s\n",
-			fields["repo"], fields["file"], fields["vuln"], fields["matches"], fields["values"])
+func getInteractiveActionsFields(id, issueURL string) map[string]interface{} {
+	if issueURL != "" {
+		return map[string]interface{}{
+			"color": "#3AA3E3",
+			"fields": []map[string]interface{}{
+				map[string]interface{}{
+					"title": "Issue",
+					"value": issueURL,
+					"short": false,
+				},
+			},
+		}
 
 	}
-	return fmt.Sprintf(":warning: *Ooops I found something...*\n"+
-		"*Repository:* %s\n*File:* %s\n*Vulnerability:* %s\n",
-		fields["repo"], fields["file"], fields["vuln"])
-
+	return map[string]interface{}{
+		"callback_id":     id,
+		"title":           "Actions",
+		"color":           "#3AA3E3",
+		"attachment_type": "default",
+		"actions": []map[string]string{
+			map[string]string{
+				"name":  "Open Issue",
+				"text":  "Open Issue",
+				"type":  "button",
+				"value": "open_issue",
+			},
+		},
+	}
 }

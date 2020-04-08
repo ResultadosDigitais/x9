@@ -8,6 +8,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/ResultadosDigitais/x9/management"
+
 	"github.com/ResultadosDigitais/x9/log"
 
 	"github.com/ResultadosDigitais/x9/log/slack"
@@ -21,7 +23,7 @@ type Leaks struct {
 func (l *Leaks) Test(url, dir string) {
 	log.Info(fmt.Sprintf("Testing repository %s", url), nil)
 	for _, file := range GetMatchingFiles(dir, l.Config) {
-		relativeFileName := strings.Replace(file.Path, "/var", "", -1)
+		relativeFileName := strings.Replace(file.Path, os.TempDir(), "", -1)
 		relativeFileName = strings.SplitAfterN(relativeFileName, string(os.PathSeparator), 3)[2]
 
 		for _, signature := range l.Signatures {
@@ -35,7 +37,8 @@ func (l *Leaks) Test(url, dir string) {
 						"vuln": signature.Name(),
 						"file": relativeFileName,
 					}
-					slack.Send(fields)
+					go insertVulnerability(url, signature.Name(), relativeFileName, "N/A")
+
 					log.Info("Vulnerability found", fields)
 
 					l.checkEntropy(file, url, relativeFileName)
@@ -73,7 +76,7 @@ func (l *Leaks) processMatches(file MatchFile, signature Signature, url, relativ
 			"file":    relativeFileName,
 			"values":  m,
 		}
-		slack.Send(fields)
+		go insertVulnerability(url, signature.Name(), relativeFileName, m)
 		log.Info("Vulnerability found", fields)
 	}
 }
@@ -95,9 +98,8 @@ func (l *Leaks) checkEntropy(file MatchFile, url, relativeFileName string) {
 						"matches": 1,
 						"values":  scanner.Text(),
 					}
-					slack.Send(fields)
+					go insertVulnerability(url, "Potential secret", relativeFileName, scanner.Text())
 					log.Info("Vulnerability found", fields)
-
 				}
 			}
 		}
@@ -118,9 +120,27 @@ func getEntropy(data string) (entropy float64) {
 
 	return entropy
 }
+func getVulnerabilityStructure(url, name, filename, values string) management.Vulnerability {
+	return management.Vulnerability{
+		Name:       name,
+		Repository: url,
+		FileName:   filename,
+		Value:      values,
+		Tool:       "X9 - Leak",
+	}
+}
 
 // Obfuscate changes the last 1/3 string characters by *'s
 func obfuscate(text string) string {
 	size := len(text)
 	return text[0:2*size/3] + strings.Repeat("*", len(text)-2*size/3)
+}
+
+func insertVulnerability(repository, vulnerability, fileName, values string) {
+	vuln := getVulnerabilityStructure(repository, vulnerability, fileName, values)
+	vuln, err := management.InsertVulnerability(vuln)
+	if err != nil {
+		log.Error("Database error", map[string]interface{}{"error": err.Error()})
+	}
+	slack.Send(repository, vulnerability, fileName, values, vuln.ID, vuln.IssueURL)
 }

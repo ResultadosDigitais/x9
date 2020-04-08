@@ -97,3 +97,17 @@ func (gs *GithubSession) GetRepository(id int64) (*github.Repository, error) {
 
 	return repo, nil
 }
+
+func (gs *GithubSession) OpenIssue(owner, repo, title, message string, labels []string) (string, error) {
+	client := gs.Client
+	issue := github.IssueRequest{
+		Title:  &title,
+		Body:   &message,
+		Labels: &labels,
+	}
+	i, _, err := client.Issues.Create(gs.Context, owner, repo, &issue)
+	if i == nil {
+		return "", err
+	}
+	return *i.HTMLURL, err
+}

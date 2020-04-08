@@ -2,16 +2,23 @@ package router
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
 
+	"github.com/ResultadosDigitais/x9/actions"
+	"github.com/ResultadosDigitais/x9/crypto"
+	"github.com/ResultadosDigitais/x9/git"
 	"github.com/ResultadosDigitais/x9/log"
+
 	"github.com/google/go-github/github"
 	"github.com/labstack/echo"
 )
 
 type Handler struct {
 	Process chan *github.PullRequestEvent
+	Session *git.GithubSession
 }
 
 // HealthCheck returns a status code 200
@@ -47,6 +54,34 @@ func (h *Handler) Event(c echo.Context) error {
 			"src_ip": src,
 		})
 	}
+	return c.NoContent(http.StatusOK)
+
+}
+
+func (h *Handler) Action(c echo.Context) error {
+	secret := os.Getenv("SLACK_SECRET_KEY")
+	version := "v0"
+	timestamp := c.Request().Header.Get("X-Slack-Request-Timestamp")
+	slackSignature := c.Request().Header.Get("X-Slack-Signature")
+	body, err := ioutil.ReadAll(c.Request().Body)
+
+	if err != nil {
+		log.Error("Error parsing body", map[string]interface{}{"error": err.Error()})
+		return c.NoContent(http.StatusBadRequest)
+	}
+
+	content := fmt.Sprintf("%s:%s:%s", version, timestamp, string(body))
+	if !crypto.ValidateHMAC(content, slackSignature, version, secret) {
+		log.Error("Error validating signature", nil)
+
+		return c.NoContent(http.StatusBadRequest)
+	}
+	values, err := url.ParseQuery(string(body))
+	if err != nil {
+		log.Error("Error on parsing form values", map[string]interface{}{"error": err.Error()})
+	}
+	payload := values.Get("payload")
+	actions.ProcessAction(payload, h.Session)
 	return c.NoContent(http.StatusOK)
 
 }

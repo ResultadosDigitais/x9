@@ -3,12 +3,18 @@ module github.com/ResultadosDigitais/x9
 go 1.12
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.4.1
+	github.com/caarlos0/env v3.5.0+incompatible // indirect
+	github.com/caarlos0/env/v6 v6.2.1
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/go-querystring v1.0.0 // indirect
+	github.com/google/uuid v1.1.1
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/echo/v4 v4.1.15 // indirect
+	github.com/lib/pq v1.3.0
+	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/sirupsen/logrus v1.4.2
-	github.com/stretchr/testify v1.4.0
+	github.com/stretchr/testify v1.5.1
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	gopkg.in/go-playground/webhooks.v5 v5.13.0 // indirect
 	gopkg.in/src-d/go-git.v4 v4.13.1

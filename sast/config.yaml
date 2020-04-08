@@ -402,9 +402,6 @@ signatures:
     regex: '''xox[baprs]-([0-9a-zA-Z]{10,48})?'''
     name: "Slack"
   - part: 'contents'
-    regex: '''-----BEGIN EC PRIVATE KEY-----'''
-    name: "EC"
-  - part: 'contents'
     regex: '''AIza[0-9A-Za-z\\-_]{35}'''
     name: "Google API key"
   - part: 'contents'
