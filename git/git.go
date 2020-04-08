@@ -109,5 +109,5 @@ func (gs *GithubSession) OpenIssue(owner, repo, title, message string, labels []
 	if i == nil {
 		return "", err
 	}
-	return *i.URL, err
+	return *i.HTMLURL, err
 }
