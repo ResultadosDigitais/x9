@@ -120,7 +120,7 @@ func getEntropy(data string) (entropy float64) {
 
 	return entropy
 }
-func getVulnerability(url, name, filename, values string) management.Vulnerability {
+func getVulnerabilityStructure(url, name, filename, values string) management.Vulnerability {
 	return management.Vulnerability{
 		Name:       name,
 		Repository: url,
@@ -137,10 +137,10 @@ func obfuscate(text string) string {
 }
 
 func insertVulnerability(repository, vulnerability, fileName, values string) {
-	vuln := getVulnerability(repository, vulnerability, fileName, values)
-	id, err := management.InsertVulnerability(vuln)
+	vuln := getVulnerabilityStructure(repository, vulnerability, fileName, values)
+	vuln, err := management.InsertVulnerability(vuln)
 	if err != nil {
 		log.Error("Database error", map[string]interface{}{"error": err.Error()})
 	}
-	slack.Send(repository, vulnerability, fileName, values, id)
+	slack.Send(repository, vulnerability, fileName, values, vuln.ID, vuln.IssueURL)
 }
