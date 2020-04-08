@@ -1,12 +1,18 @@
 package slack
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
+	"net/http"
 	"os"
+
+	"github.com/ResultadosDigitais/x9/log"
 )
 
-func Send(repository, vulnerability, filename, values, id string) {
+func Send(repository, vulnerability, filename, values, id, issueURL string) {
 	slackWebHook := os.Getenv("SLACK_WEBHOOK")
+	interactiveActions := getInteractiveActionsFields(id, issueURL)
 	if slackWebHook != "" {
 		values := map[string]interface{}{
 			"text": ":warning: *Vulnerability found*",
@@ -36,28 +42,45 @@ func Send(repository, vulnerability, filename, values, id string) {
 						},
 					},
 				},
+				interactiveActions,
+			},
+		}
+		jsonValue, _ := json.Marshal(values)
+		resp, err := http.Post(slackWebHook, "application/json", bytes.NewBuffer(jsonValue))
+		if err != nil {
+			log.Error(err.Error(), nil)
+		} else if resp.StatusCode != http.StatusOK {
+			log.Error(fmt.Sprintf("cannot send message to slack [status %d]", resp.StatusCode), nil)
+		}
+	}
+}
+
+func getInteractiveActionsFields(id, issueURL string) map[string]interface{} {
+	if issueURL != "" {
+		return map[string]interface{}{
+			"color": "#3AA3E3",
+			"fields": []map[string]interface{}{
 				map[string]interface{}{
-					"callback_id":     id,
-					"title":           "Actions",
-					"color":           "#3AA3E3",
-					"attachment_type": "default",
-					"actions": []map[string]string{
-						map[string]string{
-							"name":  "Open Issue",
-							"text":  "Open Issue",
-							"type":  "button",
-							"value": "open_issue",
-						},
-					},
+					"title": "Issue",
+					"value": issueURL,
+					"short": false,
 				},
 			},
 		}
-		json.Marshal(values)
-		// resp, err := http.Post(slackWebHook, "application/json", bytes.NewBuffer(jsonValue))
-		// if err != nil {
-		// 	log.Error(err.Error(), nil)
-		// } else if resp.StatusCode != http.StatusOK {
-		// 	log.Error(fmt.Sprintf("cannot send message to slack [status %d]", resp.StatusCode), nil)
-		// }
+
+	}
+	return map[string]interface{}{
+		"callback_id":     id,
+		"title":           "Actions",
+		"color":           "#3AA3E3",
+		"attachment_type": "default",
+		"actions": []map[string]string{
+			map[string]string{
+				"name":  "Open Issue",
+				"text":  "Open Issue",
+				"type":  "button",
+				"value": "open_issue",
+			},
+		},
 	}
 }
