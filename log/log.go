@@ -4,7 +4,6 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/ResultadosDigitais/x9/config"
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 )
@@ -17,7 +16,7 @@ var logger Logger
 
 func Init() {
 	level := logrus.InfoLevel
-	if *config.Opts.Debug {
+	if os.Getenv("DEBUG_MODE") == "1" {
 		level = logrus.DebugLevel
 	}
 	logger = Logger{
