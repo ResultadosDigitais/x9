@@ -142,5 +142,7 @@ func insertVulnerability(repository, vulnerability, fileName, values string) {
 	if err != nil {
 		log.Error("Database error", map[string]interface{}{"error": err.Error()})
 	}
-	slack.Send(repository, vulnerability, fileName, values, vuln.ID, vuln.IssueURL)
+	if !vuln.FalsePositive {
+		slack.Send(repository, vulnerability, fileName, values, vuln.ID, vuln.IssueURL)
+	}
 }
