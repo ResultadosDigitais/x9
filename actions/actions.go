@@ -2,10 +2,12 @@ package actions
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
 
+	"github.com/ResultadosDigitais/x9/config"
 	"github.com/ResultadosDigitais/x9/git"
 	"github.com/ResultadosDigitais/x9/log"
 	"github.com/ResultadosDigitais/x9/management"
@@ -52,8 +54,17 @@ func ProcessAction(body string, gs *git.GithubSession) error {
 		log.Error("Error parsing json", map[string]interface{}{"error": err.Error()})
 	}
 
-	if action.Type == "interactive_message" &&
-		action.Actions[0].Value == "open_issue" {
+	if action.Type != "interactive_message" {
+		msg := fmt.Sprintf("Unknow action type: %s", action.Type)
+		log.Warn(msg, nil)
+		return errors.New(msg)
+	}
+	if !userCanPerformAction(action.User.Name) {
+		msg := fmt.Sprintf("Permission denied: %s", action.User.Name)
+		log.Warn(msg, nil)
+	}
+	switch action.Actions[0].Value {
+	case "open_issue":
 		vuln, err := management.GetVulnerabilityByID(action.CallbackID)
 		if err != nil {
 			log.Error("Error on getting vulnerability", map[string]interface{}{"error": err.Error()})
@@ -71,7 +82,7 @@ func ProcessAction(body string, gs *git.GithubSession) error {
 		owner, repo := getRepoInfo(vuln.Repository)
 		issueURL, err := gs.OpenIssue(owner, repo, title, body, labels)
 		if err != nil {
-			log.Error("Error openning issue", map[string]interface{}{"error": err.Error()})
+			log.Error("Error on opening issue", map[string]interface{}{"error": err.Error()})
 		} else {
 			if err := management.SetIssueURL(vuln.ID, issueURL); err != nil {
 				log.Error("Error on updating issue URL", map[string]interface{}{"error": err.Error()})
@@ -79,10 +90,29 @@ func ProcessAction(body string, gs *git.GithubSession) error {
 		}
 
 		return err
+	case "false_positive":
+		if !isUserAllowed(action.User.Name) {
+			log.Error(fmt.Sprintf("User %s not allowed to perform action: set as false positive", action.User.Name), nil)
+		}
+		err := management.SetAsFalsePositive(action.CallbackID)
+		if err != nil {
+			log.Error("Error on setting issue as false positive", map[string]interface{}{"error": err.Error()})
+		}
+		log.Info(fmt.Sprintf("Vunerability %s set as false positive by %s", action.CallbackID, action.User.Name), nil)
+		return err
 	}
+
 	return nil
 }
 
+func isUserAllowed(user string) bool {
+	for _, value := range config.Opts.SlackActionsUsersAllowed {
+		if user == value {
+			return true
+		}
+	}
+	return false
+}
 func getRepoInfo(url string) (string, string) {
 	r := regexp.MustCompile(`((https://([a-z]+)\.com/)|(\.git$))`)
 	ownerAndRepo := r.ReplaceAllString(url, "")
@@ -109,4 +139,13 @@ func getIssueBody(name, values, filename string) string {
 		values,
 		filename,
 	)
+}
+
+func userCanPerformAction(user string) bool {
+	for _, u := range config.Opts.SlackActionsUsersAllowed {
+		if u == user {
+			return true
+		}
+	}
+	return false
 }
