@@ -2,15 +2,15 @@ package git
 
 import (
 	"context"
-	"errors"
 	"os"
 	"strconv"
-	"strings"
 	"time"
 
+	"github.com/ResultadosDigitais/x9/config"
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
 	"gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/plumbing"
 	"gopkg.in/src-d/go-git.v4/plumbing/transport/http"
 )
 
@@ -24,17 +24,8 @@ type GithubSession struct {
 
 //ParseAuthConfig get the github accounts from environment
 func (gs *GithubSession) ParseAuthConfig() error {
-	account, ok := os.LookupEnv("GITHUB_ACCOUNTS")
-	if !ok {
-		return errors.New("No accounts found")
-	}
-
-	credentials := strings.Split(account, ":")
-	if len(credentials) != 2 {
-		return errors.New("Invalid format")
-	}
-	gs.AccountName = credentials[0]
-	gs.AccountToken = credentials[1]
+	gs.AccountName = config.Opts.GithubAccountUser
+	gs.AccountToken = config.Opts.GithubAccountToken
 	gs.Context = context.Background()
 
 	return nil
@@ -65,7 +56,7 @@ func (gs *GithubSession) InitClient() error {
 	return nil
 }
 
-func (gs *GithubSession) CloneRepository(url, dir string) (*git.Repository, error) {
+func (gs *GithubSession) CloneRepository(url, branch, dir string) (*git.Repository, error) {
 	localCtx, cancel := context.WithTimeout(gs.Context, time.Duration(gs.Timeout)*time.Second)
 	defer cancel()
 	auth := &http.BasicAuth{Username: gs.AccountName, Password: gs.AccountToken}
@@ -74,6 +65,7 @@ func (gs *GithubSession) CloneRepository(url, dir string) (*git.Repository, erro
 		Depth:             1,
 		RecurseSubmodules: git.NoRecurseSubmodules,
 		URL:               url,
+		ReferenceName:     plumbing.ReferenceName(branch),
 		SingleBranch:      true,
 		Tags:              git.NoTags,
 		Auth:              auth,

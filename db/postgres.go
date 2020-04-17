@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/caarlos0/env/v6"
+	"github.com/ResultadosDigitais/x9/config"
 	_ "github.com/lib/pq"
 )
 
@@ -18,21 +18,24 @@ type Postgres struct {
 	DataBaseName string `env:"POSTGRES_DB,required"`
 }
 
-var config Postgres
+var dbconfig Postgres
 
 func GetDB() error {
-	err := env.Parse(&config)
-	if err != nil {
-		return err
+	dbconfig = Postgres{
+		Host:         config.Opts.DatabaseConfig.Host,
+		Port:         config.Opts.DatabaseConfig.Port,
+		User:         config.Opts.DatabaseConfig.User,
+		Password:     config.Opts.DatabaseConfig.Password,
+		DataBaseName: config.Opts.DatabaseConfig.DataBaseName,
 	}
-	err = Connect()
+	err := Connect()
 	return err
 }
 
 func Connect() error {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
-		config.Host, config.Port, config.User, config.Password, config.DataBaseName)
+		dbconfig.Host, dbconfig.Port, dbconfig.User, dbconfig.Password, dbconfig.DataBaseName)
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
 		return err

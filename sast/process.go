@@ -3,10 +3,12 @@ package sast
 import (
 	"crypto/sha1"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/ResultadosDigitais/x9/config"
@@ -29,23 +31,33 @@ func (pw *ProcessWorker) InitWorkers(w int) {
 
 func (pw *ProcessWorker) ProcessEvent() {
 	for e := range pw.Events {
-		repository, err := pw.Session.GetRepository(e.GetRepo().GetID())
+		repository, err := pw.Session.GetRepository(*e.GetPullRequest().GetHead().GetRepo().ID)
+		if err != nil {
+			log.Error(fmt.Sprintf("Error getting repository info: %s", e.GetRepo().URL), map[string]interface{}{"error": err.Error()})
+			continue
+		}
 		url := repository.GetCloneURL()
 		if isBlacklisted(url, config.GetBlacklistedRepositories()) {
 			continue
 		}
-		if err != nil {
-			log.Error(fmt.Sprintf("Error getting repository info: %s", url), map[string]interface{}{"error": err.Error()})
-		}
+		branch := fmt.Sprintf("refs/heads/%s", *e.GetPullRequest().GetHead().Ref)
 		dir := getDir(url)
-		if _, err := pw.Session.CloneRepository(url, dir); err != nil {
+		if _, err := pw.Session.CloneRepository(url, branch, dir); err != nil {
 			log.Error(fmt.Sprintf("Error cloning repository: %s", url), map[string]interface{}{"error": err.Error()})
-
+			continue
 		}
 
 		pw.Leaks.Test(url, dir)
 		os.RemoveAll(dir)
 	}
+}
+
+func getUserAndRepo(label string) (string, string, error) {
+	userAndRepo := strings.Split(label, ":")
+	if len(userAndRepo) != 2 {
+		return "", "", errors.New(fmt.Sprintf("Not a valid head label format: %s", label))
+	}
+	return userAndRepo[0], userAndRepo[1], nil
 }
 
 func isBlacklisted(repo string, blackListedRepositories []string) bool {

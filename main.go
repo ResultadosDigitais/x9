@@ -14,10 +14,12 @@ import (
 )
 
 func main() {
-	config.ParseConfig()
-
 	log.Init()
 	log.Info("X9 started...", nil)
+
+	if err := config.ParseConfig(); err != nil {
+		log.Fatal("Error on parsing config", map[string]interface{}{"error": err.Error()})
+	}
 
 	if err := db.GetDB(); err != nil {
 		log.Fatal("Database connection error", map[string]interface{}{"error": err.Error()})
@@ -51,7 +53,7 @@ func main() {
 
 	e.GET("/healthcheck", handler.HealthCheck)
 	e.POST("/events", handler.Event)
-	e.POST("/events", handler.Action)
+	e.POST("/action", handler.Action)
 
 	e.Logger.Fatal(e.Start(":3000"))
 

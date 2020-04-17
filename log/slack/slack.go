@@ -5,13 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 
+	"github.com/ResultadosDigitais/x9/config"
 	"github.com/ResultadosDigitais/x9/log"
 )
 
 func Send(repository, vulnerability, filename, values, id, issueURL string) {
-	slackWebHook := os.Getenv("SLACK_WEBHOOK")
+	slackWebHook := config.Opts.SlackWebhook
 	interactiveActions := getInteractiveActionsFields(id, issueURL)
 	if slackWebHook != "" {
 		values := map[string]interface{}{
@@ -56,6 +56,13 @@ func Send(repository, vulnerability, filename, values, id, issueURL string) {
 }
 
 func getInteractiveActionsFields(id, issueURL string) map[string]interface{} {
+	falsePositiveButton := map[string]string{
+		"name":  "False Positive",
+		"text":  "False Positive",
+		"type":  "button",
+		"value": "false_positive",
+	}
+
 	if issueURL != "" {
 		return map[string]interface{}{
 			"color": "#3AA3E3",
@@ -81,6 +88,7 @@ func getInteractiveActionsFields(id, issueURL string) map[string]interface{} {
 				"type":  "button",
 				"value": "open_issue",
 			},
+			falsePositiveButton,
 		},
 	}
 }

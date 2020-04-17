@@ -5,9 +5,9 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"os"
 
 	"github.com/ResultadosDigitais/x9/actions"
+	"github.com/ResultadosDigitais/x9/config"
 	"github.com/ResultadosDigitais/x9/crypto"
 	"github.com/ResultadosDigitais/x9/git"
 	"github.com/ResultadosDigitais/x9/log"
@@ -28,7 +28,7 @@ func (h *Handler) HealthCheck(c echo.Context) error {
 
 // Event receives an event request, check its authencity and process it
 func (h *Handler) Event(c echo.Context) error {
-	payload, err := github.ValidatePayload(c.Request(), []byte(os.Getenv("GITHUB_SECRET_WEBHOOK")))
+	payload, err := github.ValidatePayload(c.Request(), []byte(config.Opts.GithubSecretWebhook))
 	if err != nil {
 		log.Error("Request error", map[string]interface{}{"error": err.Error()})
 		return c.NoContent(http.StatusForbidden)
@@ -59,7 +59,7 @@ func (h *Handler) Event(c echo.Context) error {
 }
 
 func (h *Handler) Action(c echo.Context) error {
-	secret := os.Getenv("SLACK_SECRET_KEY")
+	secret := config.Opts.SlackSecretKey
 	version := "v0"
 	timestamp := c.Request().Header.Get("X-Slack-Request-Timestamp")
 	slackSignature := c.Request().Header.Get("X-Slack-Signature")
