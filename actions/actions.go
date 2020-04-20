@@ -62,6 +62,7 @@ func ProcessAction(body string, gs *git.GithubSession) error {
 	if !userCanPerformAction(action.User.Name) {
 		msg := fmt.Sprintf("Permission denied: %s", action.User.Name)
 		log.Warn(msg, nil)
+		return errors.New(msg)
 	}
 	switch action.Actions[0].Value {
 	case "open_issue":
