@@ -55,9 +55,6 @@ func main() {
 	e.POST("/events", handler.Event)
 	e.POST("/action", handler.Action)
 
-	// e.GET("/login", handler.LoginPage)
-	// e.GET("/auth", handler.OIDCAuth)
-
-	e.Logger.Fatal(e.Start(":3001"))
+	e.Logger.Fatal(e.Start(":3000"))
 
 }
