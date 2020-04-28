@@ -63,7 +63,6 @@ func ParseConfig() error {
 
 func getEnv(envName string) (string, error) {
 	env, ok := os.LookupEnv(envName)
-	fmt.Println(env, ok)
 	if !ok {
 		return env, errors.New(fmt.Sprintf("Missing environment variable: %s", envName))
 	}
