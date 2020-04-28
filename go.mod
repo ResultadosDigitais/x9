@@ -12,9 +12,13 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/uuid v1.1.1 // indirect
+	github.com/gorilla/sessions v1.2.0
 	github.com/labstack/echo v3.3.10+incompatible
+	github.com/labstack/echo-contrib v0.9.0
 	github.com/labstack/echo/v4 v4.1.15 // indirect
 	github.com/lib/pq v1.3.0
+	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
+	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/pquerna/cachecontrol v0.0.0-20180517163645-1555304b9b35 // indirect
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/sirupsen/logrus v1.4.2
@@ -23,6 +27,6 @@ require (
 	gopkg.in/go-playground/webhooks.v5 v5.13.0 // indirect
 	gopkg.in/square/go-jose.v2 v2.5.0 // indirect
 	gopkg.in/src-d/go-git.v4 v4.13.1
-	gopkg.in/yaml.v2 v2.2.2
+	gopkg.in/yaml.v2 v2.2.7
 	gopkg.in/yaml.v3 v3.0.0-20200121175148-a6ecf24a6d71
 )
