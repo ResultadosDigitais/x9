@@ -6,20 +6,14 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/ResultadosDigitais/x9/actions"
+	"github.com/ResultadosDigitais/x9/cmd/worker/actions"
 	"github.com/ResultadosDigitais/x9/config"
 	"github.com/ResultadosDigitais/x9/crypto"
-	"github.com/ResultadosDigitais/x9/git"
 	"github.com/ResultadosDigitais/x9/log"
 
 	"github.com/google/go-github/github"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
-
-type Handler struct {
-	Process chan *github.PullRequestEvent
-	Session *git.GithubSession
-}
 
 // HealthCheck returns a status code 200
 func (h *Handler) HealthCheck(c echo.Context) error {

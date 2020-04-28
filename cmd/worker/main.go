@@ -1,13 +1,13 @@
 package main
 
 import (
+	"github.com/ResultadosDigitais/x9/cmd/worker/git"
 	"github.com/ResultadosDigitais/x9/db"
-	"github.com/ResultadosDigitais/x9/git"
 
-	"github.com/ResultadosDigitais/x9/router"
-	"github.com/ResultadosDigitais/x9/sast"
+	"github.com/ResultadosDigitais/x9/cmd/worker/router"
+	"github.com/ResultadosDigitais/x9/cmd/worker/sast"
 	"github.com/google/go-github/github"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 
 	"github.com/ResultadosDigitais/x9/config"
 	"github.com/ResultadosDigitais/x9/log"
@@ -21,7 +21,7 @@ func main() {
 		log.Fatal("Error on parsing config", map[string]interface{}{"error": err.Error()})
 	}
 
-	if err := db.GetDB(); err != nil {
+	if err := db.GetDB(config.Opts.DatabaseConfig); err != nil {
 		log.Fatal("Database connection error", map[string]interface{}{"error": err.Error()})
 	}
 	db.InitTables()
@@ -55,6 +55,9 @@ func main() {
 	e.POST("/events", handler.Event)
 	e.POST("/action", handler.Action)
 
-	e.Logger.Fatal(e.Start(":3000"))
+	// e.GET("/login", handler.LoginPage)
+	// e.GET("/auth", handler.OIDCAuth)
+
+	e.Logger.Fatal(e.Start(":3001"))
 
 }

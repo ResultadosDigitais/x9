@@ -20,13 +20,13 @@ type Postgres struct {
 
 var dbconfig Postgres
 
-func GetDB() error {
+func GetDB(dbconf config.DatabaseConfig) error {
 	dbconfig = Postgres{
-		Host:         config.Opts.DatabaseConfig.Host,
-		Port:         config.Opts.DatabaseConfig.Port,
-		User:         config.Opts.DatabaseConfig.User,
-		Password:     config.Opts.DatabaseConfig.Password,
-		DataBaseName: config.Opts.DatabaseConfig.DataBaseName,
+		Host:         dbconf.Host,
+		Port:         dbconf.Port,
+		User:         dbconf.User,
+		Password:     dbconf.Password,
+		DataBaseName: dbconf.DataBaseName,
 	}
 	err := Connect()
 	return err

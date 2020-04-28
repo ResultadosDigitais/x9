@@ -7,8 +7,8 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/ResultadosDigitais/x9/cmd/worker/git"
 	"github.com/ResultadosDigitais/x9/config"
-	"github.com/ResultadosDigitais/x9/git"
 	"github.com/ResultadosDigitais/x9/log"
 	"github.com/ResultadosDigitais/x9/management"
 )

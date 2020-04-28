@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ResultadosDigitais/x9/cmd/worker/git"
 	"github.com/ResultadosDigitais/x9/config"
-	"github.com/ResultadosDigitais/x9/git"
 	"github.com/ResultadosDigitais/x9/log"
 	"github.com/google/go-github/github"
 )
