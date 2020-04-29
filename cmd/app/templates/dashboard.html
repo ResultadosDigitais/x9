@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.css" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/bootstrap-table@1.16.0/dist/extensions/filter-control/bootstrap-table-filter-control.min.css">
+
+
+    <title>X9 Dashboard</title>
+    </head>
+    <body class="bg-very-dark">
+        <nav class="navbar navbar-expand-md navbar navbar-dark bg-dark">
+            <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
+                <a class="navbar-brand" href="#">X9 - dashboard</a>
+            </div>
+            <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="table-responsive table-striped table-sm px-3 mt-5">
+                <table class="table"
+                        id="table"
+                        data-show-columns="true"
+                        data-pagination="true"
+                        data-filter-control="true"
+                        data-height="600"                               
+                        data-search="true"
+                        data-url="{{.AppURL}}/vuln"
+                        data-pagination="true">
+                
+                    <thead class="thead-dark">
+                        <tr>
+                            <th data-field="name"  data-sortable="true" data-filter-control="select" >Name</th>
+                            <th data-field="repository"  data-sortable="true" data-filter-control="input" data-sortable="true">Repository</th>
+                            <th data-field="filename" data-sortable="true">Filename</th>
+                            <th data-field="value" data-sortable="true">Values</th>
+                            <th data-field="issue_url" data-sortable="false">Issue URL</th>
+                        </tr>
+                    </thead>
+                  </table>
+        </div>
+
+    
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script> 
+    <script src="https://kit.fontawesome.com/6ad4c2a0fc.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.js"></script>
+    <script src="https://unpkg.com/bootstrap-table@1.16.0/dist/extensions/filter-control/bootstrap-table-filter-control.min.js"></script>
+
+</body>
+<script>
+        $(function() {
+          $('#table').bootstrapTable({escape: true})
+        })
+      </script>
+</html>

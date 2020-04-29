@@ -38,6 +38,8 @@ func main() {
 	e.GET("/login", h.Login)
 	e.GET("/auth/google/callback", h.OIDCCallback)
 	e.GET("/auth", h.OIDCAuth)
+	e.GET("/dashboard", h.Dashboard, handler.AuthMiddleware)
+	e.GET("/vuln", h.GetVulnerabilities, handler.AuthMiddleware)
 
 	e.Logger.Fatal(e.Start(":3000"))
 

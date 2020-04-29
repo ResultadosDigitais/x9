@@ -3,6 +3,7 @@ package config
 type AppConfig struct {
 	ApplicationSecretKey string
 	DatabaseConfig       DatabaseConfig
+	AppURL               string
 	OIDC                 OIDC
 }
 
@@ -17,7 +18,9 @@ func ParseAppConfig() error {
 	if AppOpts.ApplicationSecretKey, err = getEnv("APP_SECRET_KEY"); err != nil {
 		return err
 	}
-
+	if AppOpts.AppURL, err = getEnv("APP_URL"); err != nil {
+		return err
+	}
 	if AppOpts.OIDC, err = ParseOIDCConfig(); err != nil {
 		return err
 	}

@@ -1,5 +1,7 @@
 package config
 
+import "fmt"
+
 type OIDC struct {
 	ClientID     string
 	ClientSecret string
@@ -19,8 +21,7 @@ func ParseOIDCConfig() (OIDC, error) {
 	if oidc.ClientSecret, err = getEnv("OIDC_CLIENT_SECRET"); err != nil {
 		return oidc, err
 	}
-	if oidc.RedirectURL, err = getEnv("OIDC_REDIRECT_URL"); err != nil {
-		return oidc, err
-	}
+	oidc.RedirectURL = fmt.Sprintf("%s/auth/google/callback", AppOpts.AppURL)
+
 	return oidc, nil
 }

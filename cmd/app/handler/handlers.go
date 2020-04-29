@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/ResultadosDigitais/x9/cmd/app/auth"
+	"github.com/ResultadosDigitais/x9/config"
 	"github.com/ResultadosDigitais/x9/log"
 	"github.com/ResultadosDigitais/x9/management"
 	"github.com/gorilla/sessions"
@@ -53,31 +54,27 @@ func (h *Handler) OIDCCallback(c echo.Context) error {
 	}
 
 	sess.Values["token"] = rawIDToken
+	sess.Save(c.Request(), c.Response())
 
 	return c.Redirect(http.StatusFound, "/dashboard")
 }
 
-type Request struct {
-	Repo string `query:"repository"`
-	Name string `query:"name"`
+func (h *Handler) Dashboard(c echo.Context) error {
+	data := struct {
+		AppURL string
+	}{config.AppOpts.AppURL}
+	return c.Render(http.StatusOK, "dashboard.html", data)
 }
 
 func (h *Handler) GetVulnerabilities(c echo.Context) error {
-	req := new(Request)
-	if err := c.Bind(req); err != nil {
-		log.Error("Error on getting request parameters", map[string]interface{}{"error": err.Error()})
-		return c.JSON(http.StatusBadRequest, nil)
-	}
+
+	search := c.QueryParam("search")
+
 	var err error
 	var vulns []management.Vulnerability
 
-	if len(req.Name) > 0 {
-		if len(req.Repo) > 0 {
-			vulns, err = management.GetVulnerabilitiesByNameAndRepo(req.Name, req.Repo)
-		}
-		vulns, err = management.GetVulnerabilitiesByName(req.Name)
-	} else if len(req.Repo) > 0 {
-		vulns, err = management.GetVulnerabilitiesByRepo(req.Repo)
+	if search != "" {
+		vulns, err = management.GetVulnerabilitiesByNameOrRepo(search)
 	} else {
 		vulns, err = management.GetVulnerabilities()
 	}
@@ -85,5 +82,5 @@ func (h *Handler) GetVulnerabilities(c echo.Context) error {
 		log.Error("Error on getting vulnerabilities", map[string]interface{}{"error": err.Error()})
 		return c.JSON(http.StatusBadRequest, nil)
 	}
-	return c.JSON(http.StatusOK, vulns)
+	return c.JSON(http.StatusOK, map[string]interface{}{"rows": vulns, "total": len(vulns)})
 }
