@@ -34,7 +34,8 @@ func GetDB(dbconf config.DatabaseConfig) error {
 
 func Connect() error {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable",
+		"password=%s dbname=%s sslmode=disable "+
+		"sslmode=verify-ca sslrootcert=server-ca.pem sslkey=client-key.pem sslcert=client-cert.pem",
 		dbconfig.Host, dbconfig.Port, dbconfig.User, dbconfig.Password, dbconfig.DataBaseName)
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
