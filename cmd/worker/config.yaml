@@ -1,0 +1,6 @@
+num_threads: 3
+debug_mode: false
+minimum_file_size: -1
+maximum_file_size: -1
+clone_repository_timeout: 20
+blacklisted_repositories: []
