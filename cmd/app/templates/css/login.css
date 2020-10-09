@@ -1,0 +1,39 @@
+.jumbotron h1 {
+    font-family: 'Roboto',sans-serif;
+    font-size: 52px;
+    font-weight: 900;
+}
+.jumbotron h2 {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
+    font-size: 40px;
+}
+
+.jumbotron p {
+    color:darkgray;
+}
+
+.subtitle {
+    color: whitesmoke !important;
+}
+.link {
+    color: white;
+}
+
+.social {
+    color: whitesmoke !important;
+}
+
+.mt-6 {
+    margin-top: 6rem;
+}
+
+.small-title {
+    font-family: 'Roboto',sans-serif;
+    font-size: 30px;
+    font-weight: 900;
+}
+
+.bg-very-dark {
+    background-color: #161616;
+}

@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+    worker:
+        build:
+            context: .
+            dockerfile: worker.Dockerfile
+        env_file: ./docker.env
+        ports:
+            - '3000:3000'
+    app:
+        build:
+            context: .
+            dockerfile: app.Dockerfile
+        env_file: ./docker.env
+        ports:
+            - '3001:3000'
+    postgres:
+        image: postgres
+        env_file: ./docker.env
+    adminer:
+        image: adminer
+        ports: 
+            - '8081:8080'
+
