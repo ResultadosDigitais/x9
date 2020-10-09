@@ -84,6 +84,7 @@ In order to deploy the application, you'll need to:
 3) Create and set up a Slack Webhook and Interactive Components.
 
 4) Set up all environment variables defined in `docker.env.example`:
+
 | variable | description |
 | -- | -- |
 | POSTGRES_PASSWORD | Postgres database password|
