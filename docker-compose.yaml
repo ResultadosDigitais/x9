@@ -18,8 +18,4 @@ services:
     postgres:
         image: postgres
         env_file: ./docker.env
-    adminer:
-        image: adminer
-        ports: 
-            - '8081:8080'
 
