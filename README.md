@@ -73,7 +73,7 @@ Signatures have some fields that you need to set:
 | name | int |  Vulnerability name that will be displayed on the report. |
 
 
-#### Deploy
+### Deploy
 
 In order to deploy the application, you'll need to:
 
