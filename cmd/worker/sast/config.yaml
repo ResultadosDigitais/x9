@@ -440,9 +440,9 @@ signatures:
   - part: 'contents'
     regex: '''(?i)port(.{0,4})?[0-9]{1,10}'''
     name: "Port"
-  # - part: 'contents'
-  #   regex: '''[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}'''
-  #   name: "Email"
+  - part: 'contents'
+    regex: '''[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}'''
+    name: "Email"
   - part: 'contents'
     regex: '''(?i)(dbpasswd|dbuser|dbname|dbhost|api_key|apikey|secret|key|api|password|user|guid|hostname|pw|auth)(.{0,20})?[''|"][0-9a-zA-Z-_!{}/=]{4,120}[''|"]'''
     name: "Generic Credential"
@@ -455,7 +455,3 @@ signatures:
   - part:  'filename'
     regex: '''(?i)(id_rsa|passwd|id_rsa.pub|pgpass|pem|key|shadow)'''
     name: 'Keys or password files'
-### custom
-  # - part: 'contents'
-  #   regex: '''[a-zA-Z0-9._%+-]+@resultadosdigitais.com.br'''
-  #   name: "RD Email"
